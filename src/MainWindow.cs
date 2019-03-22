@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using System.Runtime.InteropServices;
-using System.Management; //add dll to reference
-using Microsoft.Win32;
-using System.Threading;
+using System.Management;
 using System.Diagnostics;
 
 namespace BrightnessControl
@@ -61,12 +50,12 @@ namespace BrightnessControl
                 {
                     foreach (ManagementObject mObj in objectCollection)
                     {
-                        var br_obj = mObj.Properties["CurrentBrightness"].Value;
-                        int br = 0;
-                        int.TryParse(br_obj + "", out br);
+                        var brightnessObject = mObj.Properties["CurrentBrightness"].Value;
+                        int brightness = 0;
+                        int.TryParse(brightnessObject + "", out brightness);
 
-                        Debug.WriteLine("GET_BRIGHTNESS " + br_obj);
-                        return br;
+                        Debug.WriteLine("GET_BRIGHTNESS " + brightnessObject);
+                        return brightness;
                         
                     }
                 }
@@ -82,9 +71,9 @@ namespace BrightnessControl
 
         private void ReturnOriginalBrightness()
         {
-            byte[] bytes = ConvertInt32ToByteArray(LAST_BRIGHTNESS_VALUE);
-            byte bytetest = bytes[0];
-            SetBrightness(bytetest);
+            byte[] lastBrightnessByteArray = ConvertInt32ToByteArray(LAST_BRIGHTNESS_VALUE);
+            byte lastBrightnessByte = lastBrightnessByteArray[0];
+            SetBrightness(lastBrightnessByte);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
