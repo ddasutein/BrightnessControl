@@ -19,18 +19,16 @@ namespace BrightnessControl
     public partial class MainWindow : Form
     {
 
+        // Global variables
         int LAST_BRIGHTNESS_VALUE;
 
         public MainWindow()
         {
             InitializeComponent();
-            //SetBrightness(20);
 
-            var brightnessValue = GetBrightness();
-            label1.Text = brightnessValue.ToString();
-
-            // Get the current brightness then save to integer 
+            // Save the current brightness value in memory 
             LAST_BRIGHTNESS_VALUE = GetBrightness();
+            LastKnownBrightnessValue.Text = LAST_BRIGHTNESS_VALUE.ToString();
         }
 
         static void SetBrightness(byte targetBrightness)
@@ -45,6 +43,8 @@ namespace BrightnessControl
                     {
                         mObj.InvokeMethod("WmiSetBrightness",
                             new Object[] { UInt32.MaxValue, targetBrightness });
+
+                        Debug.WriteLine("SET_BRIGHTNESS " + targetBrightness);
                         break;
                     }
                 }
@@ -62,9 +62,10 @@ namespace BrightnessControl
                     foreach (ManagementObject mObj in objectCollection)
                     {
                         var br_obj = mObj.Properties["CurrentBrightness"].Value;
-                        Debug.WriteLine("BRIGHTNESS_LEVEL" + br_obj);
                         int br = 0;
                         int.TryParse(br_obj + "", out br);
+
+                        Debug.WriteLine("GET_BRIGHTNESS " + br_obj);
                         return br;
                         
                     }
@@ -79,43 +80,41 @@ namespace BrightnessControl
             return BitConverter.GetBytes(I32);
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void ReturnOriginalBrightness()
         {
             byte[] bytes = ConvertInt32ToByteArray(LAST_BRIGHTNESS_VALUE);
             byte bytetest = bytes[0];
             SetBrightness(bytetest);
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ReturnOriginalBrightness();
         }
 
         private void Button1_Click(object sender, EventArgs e)
         {
             var brightnessValue = GetBrightness();
-            label1.Text = brightnessValue.ToString();
+            BrightnessValueLabel.Text = brightnessValue.ToString();
         }
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            byte[] bytes = ConvertInt32ToByteArray(LAST_BRIGHTNESS_VALUE);
-            byte bytetest = bytes[0];
-            SetBrightness(bytetest);
-
+            ReturnOriginalBrightness();
             var brightnessValue = GetBrightness();
-            label1.Text = brightnessValue.ToString();
+            BrightnessValueLabel.Text = brightnessValue.ToString();
         }
 
         private void Button3_Click(object sender, EventArgs e)
         {
+
             int NEW_BRIGHTNESS_VALUE = int.Parse(textBox1.Text);
-            byte[] bytes = ConvertInt32ToByteArray(NEW_BRIGHTNESS_VALUE);
-            byte bytetest = bytes[0];
-            SetBrightness(bytetest);
+            byte[] newBrightnessByteArray = ConvertInt32ToByteArray(NEW_BRIGHTNESS_VALUE);
+            byte newBrightnessByte = newBrightnessByteArray[0];
+            SetBrightness(newBrightnessByte);
 
             var brightnessValue = GetBrightness();
-            label1.Text = brightnessValue.ToString();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
+            BrightnessValueLabel.Text = brightnessValue.ToString();
         }
     }
 
