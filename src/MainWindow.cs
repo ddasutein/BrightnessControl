@@ -48,15 +48,22 @@ namespace BrightnessControl
             {
                 using (ManagementObjectCollection objectCollection = searcher.Get())
                 {
-                    foreach (ManagementObject mObj in objectCollection)
+                    try
                     {
-                        var brightnessObject = mObj.Properties["CurrentBrightness"].Value;
-                        int brightness = 0;
-                        int.TryParse(brightnessObject + "", out brightness);
+                        foreach (ManagementObject mObj in objectCollection)
+                        {
+                            var brightnessObject = mObj.Properties["CurrentBrightness"].Value;
+                            int brightness = 0;
+                            int.TryParse(brightnessObject + "", out brightness);
 
-                        Debug.WriteLine("GET_BRIGHTNESS " + brightnessObject);
-                        return brightness;
-                        
+                            Debug.WriteLine("GET_BRIGHTNESS " + brightnessObject);
+                            return brightness;
+
+                        }
+
+                    }catch (ManagementException e)
+                    {
+                        MessageBox.Show("DDC/CI not supported on this monitor.");
                     }
                 }
             }
@@ -104,6 +111,14 @@ namespace BrightnessControl
 
             var brightnessValue = GetBrightness();
             BrightnessValueLabel.Text = brightnessValue.ToString();
+        }
+
+        private void Button4_Click(object sender, EventArgs e)
+        {
+            int NEW_BRIGHTNESS_VALUE = int.Parse(textBox1.Text);
+            byte[] newBrightnessByteArray = ConvertInt32ToByteArray(NEW_BRIGHTNESS_VALUE);
+            byte newBrightnessByte = newBrightnessByteArray[0];
+            SetBrightness(newBrightnessByte);
         }
     }
 
