@@ -8,6 +8,12 @@ namespace BrightnessControl
     public partial class MainWindow : Form
     {
 
+        private static string[] ApiSet = new string[]
+        {
+            "Win32",
+            "UWP (Universal Windows Platform)"
+        };
+
         // Global variables
         int LAST_BRIGHTNESS_VALUE;
 
@@ -18,6 +24,11 @@ namespace BrightnessControl
             // Save the current brightness value in memory 
             LAST_BRIGHTNESS_VALUE = GetBrightness();
             LastKnownBrightnessValue.Text = LAST_BRIGHTNESS_VALUE.ToString();
+        }
+
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            this.ApiComboBox.Items.AddRange(ApiSet);
         }
 
         static void SetBrightness(byte targetBrightness)
@@ -126,10 +137,6 @@ namespace BrightnessControl
             this.Close();
         }
 
-        private void MainWindow_Load(object sender, EventArgs e)
-        {
-            // test
-        }
     }
 
 }
